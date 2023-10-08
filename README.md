@@ -1,6 +1,6 @@
 # CarNFT - Verificación de Datos de Vehículos a través de NFTs
 
-CarNFT es un proyecto que combina la tecnología blockchain con el mundo automovilístico. Permite a los mecánicos crear y gestionar NFTs (Tokens No Fungibles) que representan coches, almacenando información crucial como el modelo, el kilometraje y los registros de servicio. Estos NFTs actúan como un historial digital del vehículo, asegurando transparencia y confiabilidad en la información correspondiente a este.
+CarNFT es un proyecto que combina la tecnología blockchain con el mundo automovilístico. Permite a los mecánicos crear y gestionar NFTs (Tokens No Fungibles) que representan coches, almacenando información crucial como el modelo, el kilometraje y los registros de servicio. Y por otro lado permite a los usuarios la compraventa de estos vehiculos que tienen NFTs de verificación de datos asociados. Estos NFTs actúan como un historial digital del vehículo, asegurando transparencia y confiabilidad en su información.
 
 ## Características
 
