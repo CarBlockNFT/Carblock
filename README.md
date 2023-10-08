@@ -1,6 +1,6 @@
 # CarNFT - Verificación de Datos de Vehículos a través de NFTs
 
-CarNFT es un proyecto que utiliza la tecnología blockchain para verificar y registrar datos de vehículos a través de tokens no fungibles (NFTs). Utiliza contratos inteligentes en la red Ethereum y una interfaz web simple para interactuar con el contrato. El contrato inteligente se despliega en la blockchain de Arthera a través de Remix, este contrato inteligente genera NFT a traves de interacciones con la aplicación WEB.
+CarNFT es un proyecto que combina la tecnología blockchain con el mundo automovilístico. Permite a los mecánicos crear y gestionar NFTs (Tokens No Fungibles) que representan coches, almacenando información crucial como el modelo, el kilometraje y los registros de servicio. Estos NFTs actúan como un historial digital del vehículo, asegurando transparencia y confiabilidad en la información correspondiente a este.
 
 ## Características
 
