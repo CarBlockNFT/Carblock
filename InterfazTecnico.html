@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Venta de Coches con Historial NFT</title>
+    <!-- Incluir Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Incluir web3.js -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.3/dist/web3.min.js"></script>
+</head>
+<body>
+
+<!-- Encabezado -->
+<header style="background: url('path-to-your-background-image.jpg') no-repeat center center; background-size: cover;">
+    <div class="container text-center py-5">
+        <h1 class="font-weight-light text-shadow">CarBlock</h1>
+        <p class="text-shadow">Software de verificación de vehículos.</p>
+    </div>
+</header>
+
+
+
+<!-- Incluir Google Fonts y FontAwesome -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+    #login-screen {
+        margin-top: -100px; 
+    }
+</style>
+
+<!-- Pantalla de Login -->
+<div id="login-screen" class="container">
+    <div class="row justify-content-center align-items-center" style="height:100vh">
+        <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Iniciar Sesión</h2>
+                    <!-- Imagen -->
+                    <div class="text-center mb-4">
+                        <img src="assets/certific.png" alt="Logo" class="img-fluid" />
+                    </div>
+                    <!-- Formulario -->
+                    <form id="login-form">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                            </div>
+                            <input type="text" class="form-control" id="username" placeholder="Usuario" required>
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">
+                                    <i class="fas fa-key"></i>
+                                </span>
+                            </div>
+                            <input type="password" class="form-control" id="password" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incluir FontAwesome para los iconos -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+
+
+<!-- Contenido Principal -->
+<div id="main-content" class="container" style="display:none;">
+    <div class="row">
+        <!-- Formulario para Crear NFT -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">Crear NFT para Coche</div>
+                <div class="card-body">
+                    <button onclick="mintNFT()" class="btn btn-primary">Crear NFT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario para Actualizar NFT -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header">Actualizar NFT del Coche</div>
+                <div class="card-body">
+                    <button onclick="updateNFT()" class="btn btn-secondary">Actualizar NFT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección para mostrar NFTs -->
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Coches Disponibles</h2>
+            <div id="nft-list" class="list-group">
+                <!-- Los NFTs se agregarán aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incluir Bootstrap JS y Popper.js -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // Inicialización de web3
+    const web3 = new Web3(window.ethereum);
+
+    const demoUser = 'usuario';
+    const demoPass = 'contraseña';
+
+    // Función para manejar el login
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        if(username === demoUser && password === demoPass) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        } else {
+            alert('Usuario o contraseña incorrectos');
+        }
+    });
+
+    // Solicitar acceso a la cuenta del usuario
+    async function requestAccount() {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+    }
+
+
+    // Leer el ABI y la dirección del contrato desde aquí 
+    const abi = [
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "approved",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "Approval",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "operator",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "approved",
+				"type": "bool"
+			}
+		],
+		"name": "ApprovalForAll",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "record",
+				"type": "string"
+			}
+		],
+		"name": "NewServiceRecord",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "Transfer",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "record",
+				"type": "string"
+			}
+		],
+		"name": "addServiceRecord",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "approve",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "carOwner",
+				"type": "address"
+			},
+			{
+				"internalType": "string",
+				"name": "model",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "mileage",
+				"type": "uint256"
+			}
+		],
+		"name": "mint",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "safeTransferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "bytes",
+				"name": "_data",
+				"type": "bytes"
+			}
+		],
+		"name": "safeTransferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "operator",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "approved",
+				"type": "bool"
+			}
+		],
+		"name": "setApprovalForAll",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "mechanic",
+				"type": "address"
+			},
+			{
+				"internalType": "bool",
+				"name": "isMechanic",
+				"type": "bool"
+			}
+		],
+		"name": "setMechanic",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "transferFrom",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			}
+		],
+		"name": "balanceOf",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "cars",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "model",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "mileage",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_data",
+				"type": "string"
+			}
+		],
+		"name": "encode",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "pure",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "getApproved",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "getServiceRecord",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "getServiceRecordsCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "operator",
+				"type": "address"
+			}
+		],
+		"name": "isApprovedForAll",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "name",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "ownerOf",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "bytes4",
+				"name": "interfaceId",
+				"type": "bytes4"
+			}
+		],
+		"name": "supportsInterface",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "symbol",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "tokenByIndex",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "tokenOfOwnerByIndex",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
+			}
+		],
+		"name": "tokenURI",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalSupply",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];  // Pega el ABI de tu contrato aquí
+    const contractAddress = "0x62f630028d4E5E528Fb7CD6624a98B5e57f9dfde";  // Pega la dirección de tu contrato aquí
+    const contract = new web3.eth.Contract(abi, contractAddress);
+
+    // Funciones para Crear y Actualizar NFTs
+    async function mintNFT() {
+        await requestAccount();  // Solicita acceso si es necesario
+        const accounts = await web3.eth.getAccounts();
+        const carOwner = prompt("Propietario del vehiculo")
+        const model = prompt("Modelo del coche:");
+        const mileage = parseInt(prompt("Kilometraje del coche:"));
+        await contract.methods.mint(accounts[0], model, mileage).send({ from: accounts[0] });
+    }
+
+
+    async function updateNFT() {
+        await requestAccount();
+        const accounts = await web3.eth.getAccounts();
+        const tokenId = parseInt(prompt("ID del token:"));
+        const record = prompt("Nuevo registro de servicio:");
+        await contract.methods.addServiceRecord(tokenId, record).send({ from: accounts[0] });
+    }
+    
+
+    // ... código para renderizar los coches en venta...
+    const carForSale = {
+        tokenId: 1,
+        make: 'Toyota',
+        model: 'Corolla',
+        price: '10,000',
+        owner: 'Usuario Ejemplo',
+        image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/2021_Toyota_Corolla_SE_Hatchback.jpg/1200px-2021_Toyota_Corolla_SE_Hatchback.jpg',  // URL de una imagen del coche
+        tokenURI: 'https://explorer-test.arthera.net/tx/0x8308bbc14e20fa05f832d8ca72d5f85c6ebbbb721a8ced007b8858524ae63dca'  // URL de la información del NFT
+    };
+
+    // Función para renderizar el coche en venta en la lista de NFTs
+    function renderCarForSale(car) {
+        const carItem = `
+            <a href="${car.tokenURI}" class="list-group-item list-group-item-action" target="_blank">
+                <div class="d-flex align-items-center">
+                    <img src="${car.image}" alt="${car.make} ${car.model}" class="mr-3" style="width: 100px;">
+                    <div>
+                        <h5 class="mb-1">${car.make} ${car.model}</h5>
+                        <p class="mb-1">Precio: $${car.price}</p>
+                        <p class="mb-1">Propietario: ${car.owner}</p>
+                    </div>
+                </div>
+            </a>
+        `;
+
+        document.getElementById('nft-list').innerHTML += carItem;
+    }
+
+    // Llama a la función para renderizar el coche en venta
+    renderCarForSale(carForSale);
+
+</script>
+</body>
+</html>

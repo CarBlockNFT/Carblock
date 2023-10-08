@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarBlock - Lista de Coches</title>
+    <!-- Incluir Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Incluir Google Fonts y FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .list-group-item {
+            font-size: 1.5em; /* Ajuste del tamaño de fuente */
+        }
+
+        .list-group-item img {
+            width: 200px; /* Ajuste del tamaño de imagen */
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Encabezado -->
+<header style="background: url('path-to-your-background-image.jpg') no-repeat center center; background-size: cover;">
+    <div class="container text-center py-5">
+        <h1 class="font-weight-light text-shadow">CarBlock</h1>
+        <p class="text-shadow">Compra y vende coches con confianza.</p>
+    </div>
+</header>
+
+<div class="container my-5">
+    <h1 class="mb-4">Coches en Venta</h1>
+    <ul class="list-group">
+        <!-- Ejemplo de item en la lista con imagen -->
+        <li class="list-group-item">
+            <a href="https://explorer-test.arthera.net/tx/0xd6ca08026ff676d73cc3e03d51bb04191abbc5802c3acf8ca27deec77afb7438" target="_blank" class="d-flex align-items-center">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/2021_Toyota_Corolla_SE_Hatchback.jpg/1200px-2021_Toyota_Corolla_SE_Hatchback.jpg" alt="Toyota Corolla" class="mr-3">
+                Toyota Corolla - Usuario Ejemplo - 4.000$
+            </a>
+        </li>
+        <!-- Repite la estructura similar para otros coches -->
+        <li class="list-group-item">
+            <a href="https://explorer-test.arthera.net/tx/0x58f5a6d7f2dd3b0fd0db10fe3513ad7b6513670aeecd3bad1e230faf07d5a0f3" target="_blank" class="d-flex align-items-center">
+                <img src="https://images.ctfassets.net/uaddx06iwzdz/1JWRSBrAJ4oV2eCFoKvNQA/a875ec9826310e552ac543e2a29c1b9b/4AMvHXeB6BmKBTvAmXdNeF-1f35a16908ceb2eb2709e40a60f751be-honda-civic-type-r-l-07-1100.jpg" alt="Honda Civic" class="mr-3">
+                Honda Civic - Usuario Ejemplo - 9.000$
+            </a>
+        </li>
+        <li class="list-group-item">
+            <a href="https://explorer-test.arthera.net/tx/0x09cc2d75c64a7eae6021498760ef79b3bb97873584ba813af148262f33c8a437" target="_blank" class="d-flex align-items-center">
+                <img src="https://cdn.autobild.es/sites/navi.axelspringer.es/public/media/image/2022/09/ford-focus-st-track-pack-2825009.jpg?tf=3840x" alt="Ford Focus" class="mr-3">
+                Ford Focus - Usuario Ejemplo - 10.000$
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Incluir Bootstrap JS y Popper.js -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
